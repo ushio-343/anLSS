@@ -1,0 +1,445 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    COMMA
+    DOT
+    PLUS
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> PUBLIC CLASS ID OPEN_BRACE main_method CLOSE_BRACE
+Rule 2     main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+Rule 3     statement_list -> statement
+Rule 4     statement_list -> statement_list statement
+Rule 5     statement -> println_statement
+Rule 6     statement -> for_statement
+Rule 7     println_statement -> PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON
+Rule 8     for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+Terminals, with rules where they appear
+
+CLASS                : 1
+CLOSE_BRACE          : 1 2 8
+CLOSE_PAREN          : 2 7 8
+COMMA                : 
+DOT                  : 
+EQUAL                : 8
+FOR                  : 8
+ID                   : 1 2 8 8 8
+INT                  : 8
+LBRACKET             : 2
+LT                   : 8
+MAIN                 : 2
+NUMBER               : 8 8
+OPEN_BRACE           : 1 2 8
+OPEN_PAREN           : 2 7 8
+PLUS                 : 
+PLUSPLUS             : 8
+PRINTLN              : 7
+PUBLIC               : 1 2
+RBRACKET             : 2
+SEMICOLON            : 7 8 8
+STATIC               : 2
+STRING               : 2
+STRING_LITERAL       : 7
+VOID                 : 2
+error                : 
+
+Nonterminals, with rules where they appear
+
+for_statement        : 6
+main_method          : 1
+println_statement    : 5
+program              : 0
+statement            : 3 4
+statement_list       : 2 4 8
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . PUBLIC CLASS ID OPEN_BRACE main_method CLOSE_BRACE
+
+    PUBLIC          shift and go to state 2
+
+    program                        shift and go to state 1
+
+state 1
+
+    (0) S' -> program .
+
+
+
+state 2
+
+    (1) program -> PUBLIC . CLASS ID OPEN_BRACE main_method CLOSE_BRACE
+
+    CLASS           shift and go to state 3
+
+
+state 3
+
+    (1) program -> PUBLIC CLASS . ID OPEN_BRACE main_method CLOSE_BRACE
+
+    ID              shift and go to state 4
+
+
+state 4
+
+    (1) program -> PUBLIC CLASS ID . OPEN_BRACE main_method CLOSE_BRACE
+
+    OPEN_BRACE      shift and go to state 5
+
+
+state 5
+
+    (1) program -> PUBLIC CLASS ID OPEN_BRACE . main_method CLOSE_BRACE
+    (2) main_method -> . PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    PUBLIC          shift and go to state 6
+
+    main_method                    shift and go to state 7
+
+state 6
+
+    (2) main_method -> PUBLIC . STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    STATIC          shift and go to state 8
+
+
+state 7
+
+    (1) program -> PUBLIC CLASS ID OPEN_BRACE main_method . CLOSE_BRACE
+
+    CLOSE_BRACE     shift and go to state 9
+
+
+state 8
+
+    (2) main_method -> PUBLIC STATIC . VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    VOID            shift and go to state 10
+
+
+state 9
+
+    (1) program -> PUBLIC CLASS ID OPEN_BRACE main_method CLOSE_BRACE .
+
+    $end            reduce using rule 1 (program -> PUBLIC CLASS ID OPEN_BRACE main_method CLOSE_BRACE .)
+
+
+state 10
+
+    (2) main_method -> PUBLIC STATIC VOID . MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    MAIN            shift and go to state 11
+
+
+state 11
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN . OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    OPEN_PAREN      shift and go to state 12
+
+
+state 12
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN . STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    STRING          shift and go to state 13
+
+
+state 13
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING . LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    LBRACKET        shift and go to state 14
+
+
+state 14
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET . RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    RBRACKET        shift and go to state 15
+
+
+state 15
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET . ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    ID              shift and go to state 16
+
+
+state 16
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID . CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    CLOSE_PAREN     shift and go to state 17
+
+
+state 17
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN . OPEN_BRACE statement_list CLOSE_BRACE
+
+    OPEN_BRACE      shift and go to state 18
+
+
+state 18
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE . statement_list CLOSE_BRACE
+    (3) statement_list -> . statement
+    (4) statement_list -> . statement_list statement
+    (5) statement -> . println_statement
+    (6) statement -> . for_statement
+    (7) println_statement -> . PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON
+    (8) for_statement -> . FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    PRINTLN         shift and go to state 23
+    FOR             shift and go to state 24
+
+    statement_list                 shift and go to state 19
+    statement                      shift and go to state 20
+    println_statement              shift and go to state 21
+    for_statement                  shift and go to state 22
+
+state 19
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list . CLOSE_BRACE
+    (4) statement_list -> statement_list . statement
+    (5) statement -> . println_statement
+    (6) statement -> . for_statement
+    (7) println_statement -> . PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON
+    (8) for_statement -> . FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    CLOSE_BRACE     shift and go to state 25
+    PRINTLN         shift and go to state 23
+    FOR             shift and go to state 24
+
+    statement                      shift and go to state 26
+    println_statement              shift and go to state 21
+    for_statement                  shift and go to state 22
+
+state 20
+
+    (3) statement_list -> statement .
+
+    CLOSE_BRACE     reduce using rule 3 (statement_list -> statement .)
+    PRINTLN         reduce using rule 3 (statement_list -> statement .)
+    FOR             reduce using rule 3 (statement_list -> statement .)
+
+
+state 21
+
+    (5) statement -> println_statement .
+
+    CLOSE_BRACE     reduce using rule 5 (statement -> println_statement .)
+    PRINTLN         reduce using rule 5 (statement -> println_statement .)
+    FOR             reduce using rule 5 (statement -> println_statement .)
+
+
+state 22
+
+    (6) statement -> for_statement .
+
+    CLOSE_BRACE     reduce using rule 6 (statement -> for_statement .)
+    PRINTLN         reduce using rule 6 (statement -> for_statement .)
+    FOR             reduce using rule 6 (statement -> for_statement .)
+
+
+state 23
+
+    (7) println_statement -> PRINTLN . OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON
+
+    OPEN_PAREN      shift and go to state 27
+
+
+state 24
+
+    (8) for_statement -> FOR . OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    OPEN_PAREN      shift and go to state 28
+
+
+state 25
+
+    (2) main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE .
+
+    CLOSE_BRACE     reduce using rule 2 (main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE .)
+
+
+state 26
+
+    (4) statement_list -> statement_list statement .
+
+    CLOSE_BRACE     reduce using rule 4 (statement_list -> statement_list statement .)
+    PRINTLN         reduce using rule 4 (statement_list -> statement_list statement .)
+    FOR             reduce using rule 4 (statement_list -> statement_list statement .)
+
+
+state 27
+
+    (7) println_statement -> PRINTLN OPEN_PAREN . STRING_LITERAL CLOSE_PAREN SEMICOLON
+
+    STRING_LITERAL  shift and go to state 29
+
+
+state 28
+
+    (8) for_statement -> FOR OPEN_PAREN . INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    INT             shift and go to state 30
+
+
+state 29
+
+    (7) println_statement -> PRINTLN OPEN_PAREN STRING_LITERAL . CLOSE_PAREN SEMICOLON
+
+    CLOSE_PAREN     shift and go to state 31
+
+
+state 30
+
+    (8) for_statement -> FOR OPEN_PAREN INT . ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    ID              shift and go to state 32
+
+
+state 31
+
+    (7) println_statement -> PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN . SEMICOLON
+
+    SEMICOLON       shift and go to state 33
+
+
+state 32
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID . EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    EQUAL           shift and go to state 34
+
+
+state 33
+
+    (7) println_statement -> PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON .
+
+    CLOSE_BRACE     reduce using rule 7 (println_statement -> PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON .)
+    PRINTLN         reduce using rule 7 (println_statement -> PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON .)
+    FOR             reduce using rule 7 (println_statement -> PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON .)
+
+
+state 34
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL . NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    NUMBER          shift and go to state 35
+
+
+state 35
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER . SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    SEMICOLON       shift and go to state 36
+
+
+state 36
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON . ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    ID              shift and go to state 37
+
+
+state 37
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID . LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    LT              shift and go to state 38
+
+
+state 38
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT . NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    NUMBER          shift and go to state 39
+
+
+state 39
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER . SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    SEMICOLON       shift and go to state 40
+
+
+state 40
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON . ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    ID              shift and go to state 41
+
+
+state 41
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID . PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    PLUSPLUS        shift and go to state 42
+
+
+state 42
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS . CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    CLOSE_PAREN     shift and go to state 43
+
+
+state 43
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN . OPEN_BRACE statement_list CLOSE_BRACE
+
+    OPEN_BRACE      shift and go to state 44
+
+
+state 44
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE . statement_list CLOSE_BRACE
+    (3) statement_list -> . statement
+    (4) statement_list -> . statement_list statement
+    (5) statement -> . println_statement
+    (6) statement -> . for_statement
+    (7) println_statement -> . PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON
+    (8) for_statement -> . FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    PRINTLN         shift and go to state 23
+    FOR             shift and go to state 24
+
+    statement_list                 shift and go to state 45
+    statement                      shift and go to state 20
+    println_statement              shift and go to state 21
+    for_statement                  shift and go to state 22
+
+state 45
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list . CLOSE_BRACE
+    (4) statement_list -> statement_list . statement
+    (5) statement -> . println_statement
+    (6) statement -> . for_statement
+    (7) println_statement -> . PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON
+    (8) for_statement -> . FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE
+
+    CLOSE_BRACE     shift and go to state 46
+    PRINTLN         shift and go to state 23
+    FOR             shift and go to state 24
+
+    statement                      shift and go to state 26
+    println_statement              shift and go to state 21
+    for_statement                  shift and go to state 22
+
+state 46
+
+    (8) for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE .
+
+    CLOSE_BRACE     reduce using rule 8 (for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE .)
+    PRINTLN         reduce using rule 8 (for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE .)
+    FOR             reduce using rule 8 (for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE .)
+
