@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/index.css">
-    <title>Analyzer</title>
+    <title>Lexical and Syntax Analyzer</title>
 </head>
 
 <body>
@@ -13,74 +13,57 @@
         <div class="container-content-lexico">
             <h1>Lexical and Syntax Analyzer</h1>
             <div class="container-elements-lexicos">
-                <form action="/" method="post">
-                    <textarea name="code" cols="30" rows="10" placeholder="Enter code here">{{ code }}</textarea>
+                <form action="/analyze" method="post">
+                    <textarea name="code" cols="30" rows="10" placeholder="Enter code here"></textarea>
                     <button class="button-value-lexico" type="submit">Analyze</button>
                 </form>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Token</th>
-                            <th>PR</th>
-                            <th>ID</th>
-                            <th>SIM</th>
-                            <th>ERRORES</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for entry in token_data %}
-                        <tr>
-                            <td>{{ entry.token }}</td>
-                            <td>{{ entry.PR }}</td>
-                            <td>{{ entry.ID }}</td>
-                            <td>{{ entry.SIM }}</td>
-                            <td>{{ entry.ERROR }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div>
-                <h2>Token Counts</h2>
-                <p>Palabras reservadas: {{ total_reserved }}</p>
-                <p>Identificadores: {{ counters['ID'] }}</p>
-                <p>Signo +: {{ counters['PLUS'] }}</p>
-                <p>Signo =: {{ counters['EQUAL'] }}</p>
-                <p>Parentesis abiertos: {{ counters['OPEN_PAREN'] }}</p>
-                <p>Parentesis cerrados: {{ counters['CLOSE_PAREN'] }}</p>
-                <p>Punto y coma: {{ counters['SEMICOLON'] }}</p>
-                <p>Comillas: {{ counters['STRING_LITERAL'] }}</p>
-                <p>Comas: {{ counters['COMMA'] }}</p>
-                <p>Llaves abiertas: {{ counters['OPEN_BRACE'] }}</p>
-                <p>Llaves cerradas: {{ counters['CLOSE_BRACE'] }}</p>
-                <p>Errores: {{ total_errors }}</p>
-            </div>
-            <div>
-                <h2>Syntax Analysis</h2>
-                {% if syntax_correct %}
-                <p>La estructura del código es correcta.</p>
-                {% else %}
-                <ul>
-                    {% for error in syntax_errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
-            <div>
-                <h2>Semantic Analysis</h2>
-                {% if semantic_errors %}
-                <ul>
-                    {% for error in semantic_errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p>No semantic errors found.</p>
-                {% endif %}
+                <div id="results"></div>
             </div>
         </div>
     </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const code = formData.get('code');
+
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            if (data.errors || data.syntax_errors) {
+                if (data.errors) {
+                    resultsDiv.innerHTML += '<h2>Errors</h2><ul>';
+                    data.errors.forEach(error => {
+                        resultsDiv.innerHTML += `<li>${error}</li>`;
+                    });
+                    resultsDiv.innerHTML += '</ul>';
+                }
+                if (data.syntax_errors) {
+                    resultsDiv.innerHTML += '<h2>Syntax Errors</h2><ul>';
+                    data.syntax_errors.forEach(error => {
+                        resultsDiv.innerHTML += `<li>${error}</li>`;
+                    });
+                    resultsDiv.innerHTML += '</ul>';
+                }
+            } else {
+                resultsDiv.innerHTML += '<p>No syntax errors found.</p>';
+            }
+
+            resultsDiv.innerHTML += '<h2>Lexical Analysis</h2><ul>';
+            data.lexical.forEach(token => {
+                resultsDiv.innerHTML += `<li>Value: ${token.value}, Type: ${token.type}, Category: ${token.category}</li>`;
+            });
+            resultsDiv.innerHTML += '</ul>';
+        });
+    </script>
 </body>
 
 </html>

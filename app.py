@@ -1,73 +1,69 @@
-from flask import Flask, render_template, request
+from flask import Flask, request, render_template, jsonify
 import ply.lex as lex
 import ply.yacc as yacc
 
 app = Flask(__name__)
 
-# List of token names
-tokens = [
-    'ID', 'NUMBER', 'STRING_LITERAL',
-    'PLUS', 'EQUAL', 'OPEN_PAREN', 'CLOSE_PAREN',
-    'OPEN_BRACE', 'CLOSE_BRACE', 'COMMA', 'SEMICOLON',
-    'DOT', 'LBRACKET', 'RBRACKET', 'PRINTLN', 'FOR', 'LT', 'PLUSPLUS'
-]
+# Definición del lexer
+tokens = (
+    'INT', 'SEMICOLON', 'ID', 'EQUALS', 'NUMBER', 'FOR', 'LPAREN', 'RPAREN',
+    'LT', 'GT', 'LE', 'GE', 'EQ', 'NE', 'PLUSPLUS', 'LBRACE', 'RBRACE', 'PRINTLN'
+)
 
-# Reserved words
-reserved = {
-    'public': 'PUBLIC',
-    'class': 'CLASS',
-    'static': 'STATIC',
-    'void': 'VOID',
-    'main': 'MAIN',
-    'String': 'STRING',
-    'int': 'INT',
-    'for': 'FOR',
-    'System.out.println': 'PRINTLN'
-}
-
-tokens = tokens + list(reserved.values())
-
-# Token regex definitions
-t_PLUS = r'\+'
-t_EQUAL = r'='
-t_OPEN_PAREN = r'\('
-t_CLOSE_PAREN = r'\)'
-t_OPEN_BRACE = r'\{'
-t_CLOSE_BRACE = r'\}'
-t_COMMA = r','
+t_ignore = ' \t'
 t_SEMICOLON = r';'
-t_DOT = r'\.'
-t_LBRACKET = r'\['
-t_RBRACKET = r'\]'
+t_EQUALS = r'='
+t_LPAREN = r'\('
+t_RPAREN = r'\)'
 t_LT = r'<'
+t_GT = r'>'
+t_LE = r'<='
+t_GE = r'>='
+t_EQ = r'=='
+t_NE = r'!='
+t_LBRACE = r'\{'
+t_RBRACE = r'\}'
 t_PLUSPLUS = r'\+\+'
-t_STRING_LITERAL = r'\"([^\\\n]|(\\.))*?\"'
-t_ignore = ' \t\n\r'
+
+def t_INT(t):
+    r'int'
+    return t
+
+def t_FOR(t):
+    r'for'
+    return t
+
+def t_PRINTLN(t):
+    r'System\.out\.println'
+    return t
+
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    return t
 
 def t_NUMBER(t):
     r'\d+'
     t.value = int(t.value)
     return t
 
-def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value, 'ID')
-    return t
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
 
 def t_error(t):
-    print(f"Illegal character '{t.value[0]}'")
+    print(f"Illegal character '{t.value[0]}' at line {t.lexer.lineno}")
     t.lexer.skip(1)
 
 lexer = lex.lex()
 
-# Yacc Parsing rules
-def p_program(p):
-    '''program : PUBLIC CLASS ID OPEN_BRACE main_method CLOSE_BRACE'''
-    p[0] = ('program', p[3], p[5])
+# Definición del parser
+variables = set()
+errors = []
+syntax_errors = []
 
-def p_main_method(p):
-    '''main_method : PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE'''
-    p[0] = ('main_method', p[11])
+def p_program(p):
+    '''program : statement_list'''
+    p[0] = p[1]
 
 def p_statement_list(p):
     '''statement_list : statement
@@ -78,99 +74,121 @@ def p_statement_list(p):
         p[0] = p[1] + [p[2]]
 
 def p_statement(p):
-    '''statement : println_statement
-                 | for_statement'''
+    '''statement : declaration
+                 | for_loop
+                 | block
+                 | println'''
     p[0] = p[1]
 
-def p_println_statement(p):
-    '''println_statement : PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON'''
-    p[0] = ('println', p[3])
+def p_declaration(p):
+    '''declaration : INT ID SEMICOLON'''
+    var_name = p[2]
+    if var_name in variables:
+        errors.append(f"Línea {p.lineno(1)}: La variable '{var_name}' ya está declarada.")
+    else:
+        variables.add(var_name)
 
-def p_for_statement(p):
-    '''for_statement : FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE'''
-    p[0] = ('for', p[4], p[6], p[9], p[11], p[13], p[16])
+def p_for_loop(p):
+    '''for_loop : FOR LPAREN assignment SEMICOLON condition SEMICOLON increment RPAREN block'''
+    var_name = p[3][0]
+    if p[3][1] not in variables:
+        errors.append(f"Línea {p.lineno(1)}: La variable '{p[3][1]}' usada en la asignación no está declarada.")
+    if p[5][0] not in variables:
+        errors.append(f"Línea {p.lineno(1)}: La variable '{p[5][0]}' usada en la condición no está declarada.")
+    if p[7][0] not in variables:
+        errors.append(f"Línea {p.lineno(1)}: La variable '{p[7][0]}' usada en el incremento no está declarada.")
+    if var_name != p[5][0] or var_name != p[7][0]:
+        errors.append(f"Línea {p.lineno(1)}: La variable usada en la estructura for no es consistente.")
+
+def p_assignment(p):
+    '''assignment : ID EQUALS NUMBER'''
+    p[0] = (p[1], p[1])
+
+def p_condition(p):
+    '''condition : ID LT NUMBER
+                 | ID GT NUMBER
+                 | ID LE NUMBER
+                 | ID GE NUMBER
+                 | ID EQ NUMBER
+                 | ID NE NUMBER'''
+    p[0] = (p[1], p[1])
+
+def p_increment(p):
+    '''increment : ID PLUSPLUS'''
+    p[0] = (p[1], p[1])
+
+def p_block(p):
+    '''block : LBRACE statement_list RBRACE'''
+    p[0] = p[2]
+
+def p_println(p):
+    '''println : PRINTLN LPAREN ID RPAREN SEMICOLON'''
+    var_name = p[3]
+    if var_name not in variables:
+        errors.append(f"Línea {p.lineno(1)}: La variable '{var_name}' usada en println no está declarada.")
+    else:
+        p[0] = True
 
 def p_error(p):
     if p:
-        print(f"Syntax error at '{p.value}'")
-        raise SyntaxError(f"Syntax error at '{p.value}'")
+        syntax_errors.append(f"Error de sintaxis en '{p.value}' en la línea {p.lineno}")
     else:
-        print("Syntax error at EOF")
-        raise SyntaxError("Syntax error at EOF")
+        syntax_errors.append("Error de sintaxis al final del archivo")
 
 parser = yacc.yacc()
 
-# Semantic analysis
-def semantic_analysis(parsed_code):
-    declared_variables = set()
-    errors = []
+def perform_lexical_analysis(code):
+    lexer.input(code)
+    token_list = []
+    totals = {'Reservada': 0, 'Identificador': 0, 'Número': 0, 'Símbolo': 0, 'Error': 0}
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break
+        category = categorize_token(tok.type)
+        token_list.append({
+            'value': tok.value,
+            'type': tok.type,
+            'category': category
+        })
+        totals[category] += 1
+    return token_list, totals
 
-    def check_statement(statement):
-        if statement[0] == 'for':
-            _, var_name, init_val, cond_var, cond_val, inc_var, body = statement
-            if var_name != cond_var or cond_var != inc_var:
-                errors.append(f"Semantic error: Variable '{var_name}' is used inconsistently in the for loop")
-            if var_name in declared_variables:
-                errors.append(f"Semantic error: Variable '{var_name}' is redeclared in the for loop")
-            declared_variables.add(var_name)
-            for stmt in body:
-                check_statement(stmt)
-        elif statement[0] == 'println':
-            _, string_literal = statement
-            # No semantic checks needed for println in this context
+def categorize_token(token_type):
+    if token_type in ['INT', 'FOR', 'PRINTLN']:
+        return 'Reservada'
+    elif token_type == 'ID':
+        return 'Identificador'
+    elif token_type == 'NUMBER':
+        return 'Número'
+    elif token_type in ['SEMICOLON', 'EQUALS', 'LPAREN', 'RPAREN', 'LT', 'GT', 'LE', 'GE', 'EQ', 'NE', 'PLUSPLUS', 'LBRACE', 'RBRACE']:
+        return 'Símbolo'
+    else:
+        return 'Error'
 
-    for stmt in parsed_code:
-        check_statement(stmt)
-
-    return errors
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    counters = {tok: 0 for tok in tokens}
-    counters.update({val: 0 for val in reserved.values()})
-    token_data = []
-    lexical_errors = []
+    return render_template('index.html')
+
+@app.route('/analyze', methods=['POST'])
+def analyze():
+    global variables, errors, syntax_errors
+    code = request.form['code']
+    if not code:
+        return jsonify({"error": "No se proporcionó código"}), 400
+
+    variables = set()
+    errors = []
     syntax_errors = []
-    semantic_errors = []
-    syntax_correct = False
-    code = ''
-    if request.method == 'POST':
-        code = request.form.get('code', '')
-        lexer.input(code)
-        while True:
-            tok = lexer.token()
-            if not tok:
-                break
-            entry = {'token': tok.value, 'PR': '', 'ID': '', 'SIM': '', 'ERROR': ''}
-            if tok.type in reserved.values():
-                entry['PR'] = 'X'
-            elif tok.type == 'ID':
-                entry['ID'] = 'X'
-            elif tok.type == 'PRINTLN':
-                entry['PR'] = 'X'
-            elif tok.type == 'ERROR':
-                entry['ERROR'] = 'X'
-                lexical_errors.append(f"Error Léxico: '{tok.value}'")
-            else:
-                entry['SIM'] = 'X'
-            counters[tok.type] += 1
-            token_data.append(entry)
+    lexer.lineno = 1
 
-        # Syntax analysis
-        try:
-            parsed_code = parser.parse(code, lexer=lexer)
-            syntax_correct = True
-            # Semantic analysis
-            semantic_errors = semantic_analysis(parsed_code)
-        except SyntaxError as e:
-            syntax_errors.append(str(e))
+    token_list, totals = perform_lexical_analysis(code)
+    parser.parse(code)
 
-    total_reserved = sum(counters[val] for val in reserved.values())
-    total_errors = counters['ERROR'] if 'ERROR' in counters else 0
+    if not errors and not syntax_errors:
+        return jsonify({"message": "El código es correcto", "lexical": token_list, "totals": totals, "syntax_errors": []}), 200
+    else:
+        return jsonify({"errors": errors, "lexical": token_list, "totals": totals, "syntax_errors": syntax_errors}), 200
 
-    return render_template("index.html", token_data=token_data, counters=counters, total_reserved=total_reserved,
-                           lexical_errors=lexical_errors, total_errors=total_errors, syntax_errors=syntax_errors,
-                           semantic_errors=semantic_errors, syntax_correct=syntax_correct, code=code)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

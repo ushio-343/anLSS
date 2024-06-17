@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'CLASS CLOSE_BRACE CLOSE_PAREN COMMA DOT EQUAL FOR FOR ID INT LBRACKET LT MAIN NUMBER OPEN_BRACE OPEN_PAREN PLUS PLUSPLUS PRINTLN PRINTLN PUBLIC RBRACKET SEMICOLON STATIC STRING STRING_LITERAL VOIDprogram : PUBLIC CLASS ID OPEN_BRACE main_method CLOSE_BRACEmain_method : PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACEstatement_list : statement\n                      | statement_list statementstatement : println_statement\n                 | for_statementprintln_statement : PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLONfor_statement : FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE'
+_lr_signature = 'EQ EQUALS FOR GE GT ID INT LBRACE LE LPAREN LT NE NUMBER PLUSPLUS PRINTLN RBRACE RPAREN SEMICOLONprogram : statement_liststatement_list : statement\n                      | statement_list statementstatement : declaration\n                 | for_loop\n                 | block\n                 | printlndeclaration : INT ID SEMICOLONfor_loop : FOR LPAREN assignment SEMICOLON condition SEMICOLON increment RPAREN blockassignment : ID EQUALS NUMBERcondition : ID LT NUMBER\n                 | ID GT NUMBER\n                 | ID LE NUMBER\n                 | ID GE NUMBER\n                 | ID EQ NUMBER\n                 | ID NE NUMBERincrement : ID PLUSPLUSblock : LBRACE statement_list RBRACEprintln : PRINTLN LPAREN ID RPAREN SEMICOLON'
     
-_lr_action_items = {'PUBLIC':([0,5,],[2,6,]),'$end':([1,9,],[0,-1,]),'CLASS':([2,],[3,]),'ID':([3,15,30,36,40,],[4,16,32,37,41,]),'OPEN_BRACE':([4,17,43,],[5,18,44,]),'STATIC':([6,],[8,]),'CLOSE_BRACE':([7,19,20,21,22,25,26,33,45,46,],[9,25,-3,-5,-6,-2,-4,-7,46,-8,]),'VOID':([8,],[10,]),'MAIN':([10,],[11,]),'OPEN_PAREN':([11,23,24,],[12,27,28,]),'STRING':([12,],[13,]),'LBRACKET':([13,],[14,]),'RBRACKET':([14,],[15,]),'CLOSE_PAREN':([16,29,42,],[17,31,43,]),'PRINTLN':([18,19,20,21,22,26,33,44,45,46,],[23,23,-3,-5,-6,-4,-7,23,23,-8,]),'FOR':([18,19,20,21,22,26,33,44,45,46,],[24,24,-3,-5,-6,-4,-7,24,24,-8,]),'STRING_LITERAL':([27,],[29,]),'INT':([28,],[30,]),'SEMICOLON':([31,35,39,],[33,36,40,]),'EQUAL':([32,],[34,]),'NUMBER':([34,38,],[35,39,]),'LT':([37,],[38,]),'PLUSPLUS':([41,],[42,]),}
+_lr_action_items = {'INT':([0,2,3,4,5,6,7,10,12,15,17,20,28,46,],[8,8,-2,-4,-5,-6,-7,8,-3,8,-8,-18,-19,-9,]),'FOR':([0,2,3,4,5,6,7,10,12,15,17,20,28,46,],[9,9,-2,-4,-5,-6,-7,9,-3,9,-8,-18,-19,-9,]),'LBRACE':([0,2,3,4,5,6,7,10,12,15,17,20,28,44,46,],[10,10,-2,-4,-5,-6,-7,10,-3,10,-8,-18,-19,10,-9,]),'PRINTLN':([0,2,3,4,5,6,7,10,12,15,17,20,28,46,],[11,11,-2,-4,-5,-6,-7,11,-3,11,-8,-18,-19,-9,]),'$end':([1,2,3,4,5,6,7,12,17,20,28,46,],[0,-1,-2,-4,-5,-6,-7,-3,-8,-18,-19,-9,]),'RBRACE':([3,4,5,6,7,12,15,17,20,28,46,],[-2,-4,-5,-6,-7,-3,20,-8,-18,-19,-9,]),'ID':([8,14,16,22,29,],[13,19,21,26,37,]),'LPAREN':([9,11,],[14,16,]),'SEMICOLON':([13,18,24,25,27,38,39,40,41,42,43,],[17,22,28,29,-10,-11,-12,-13,-14,-15,-16,]),'EQUALS':([19,],[23,]),'RPAREN':([21,36,45,],[24,44,-17,]),'NUMBER':([23,30,31,32,33,34,35,],[27,38,39,40,41,42,43,]),'LT':([26,],[30,]),'GT':([26,],[31,]),'LE':([26,],[32,]),'GE':([26,],[33,]),'EQ':([26,],[34,]),'NE':([26,],[35,]),'PLUSPLUS':([37,],[45,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'program':([0,],[1,]),'main_method':([5,],[7,]),'statement_list':([18,44,],[19,45,]),'statement':([18,19,44,45,],[20,26,20,26,]),'println_statement':([18,19,44,45,],[21,21,21,21,]),'for_statement':([18,19,44,45,],[22,22,22,22,]),}
+_lr_goto_items = {'program':([0,],[1,]),'statement_list':([0,10,],[2,15,]),'statement':([0,2,10,15,],[3,12,3,12,]),'declaration':([0,2,10,15,],[4,4,4,4,]),'for_loop':([0,2,10,15,],[5,5,5,5,]),'block':([0,2,10,15,44,],[6,6,6,6,46,]),'println':([0,2,10,15,],[7,7,7,7,]),'assignment':([14,],[18,]),'condition':([22,],[25,]),'increment':([29,],[36,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,12 +27,23 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> program","S'",1,None,None,None),
-  ('program -> PUBLIC CLASS ID OPEN_BRACE main_method CLOSE_BRACE','program',6,'p_program','app.py',65),
-  ('main_method -> PUBLIC STATIC VOID MAIN OPEN_PAREN STRING LBRACKET RBRACKET ID CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE','main_method',13,'p_main_method','app.py',69),
-  ('statement_list -> statement','statement_list',1,'p_statement_list','app.py',73),
-  ('statement_list -> statement_list statement','statement_list',2,'p_statement_list','app.py',74),
-  ('statement -> println_statement','statement',1,'p_statement','app.py',81),
-  ('statement -> for_statement','statement',1,'p_statement','app.py',82),
-  ('println_statement -> PRINTLN OPEN_PAREN STRING_LITERAL CLOSE_PAREN SEMICOLON','println_statement',5,'p_println_statement','app.py',86),
-  ('for_statement -> FOR OPEN_PAREN INT ID EQUAL NUMBER SEMICOLON ID LT NUMBER SEMICOLON ID PLUSPLUS CLOSE_PAREN OPEN_BRACE statement_list CLOSE_BRACE','for_statement',17,'p_for_statement','app.py',90),
+  ('program -> statement_list','program',1,'p_program','app.py',65),
+  ('statement_list -> statement','statement_list',1,'p_statement_list','app.py',69),
+  ('statement_list -> statement_list statement','statement_list',2,'p_statement_list','app.py',70),
+  ('statement -> declaration','statement',1,'p_statement','app.py',77),
+  ('statement -> for_loop','statement',1,'p_statement','app.py',78),
+  ('statement -> block','statement',1,'p_statement','app.py',79),
+  ('statement -> println','statement',1,'p_statement','app.py',80),
+  ('declaration -> INT ID SEMICOLON','declaration',3,'p_declaration','app.py',84),
+  ('for_loop -> FOR LPAREN assignment SEMICOLON condition SEMICOLON increment RPAREN block','for_loop',9,'p_for_loop','app.py',92),
+  ('assignment -> ID EQUALS NUMBER','assignment',3,'p_assignment','app.py',104),
+  ('condition -> ID LT NUMBER','condition',3,'p_condition','app.py',108),
+  ('condition -> ID GT NUMBER','condition',3,'p_condition','app.py',109),
+  ('condition -> ID LE NUMBER','condition',3,'p_condition','app.py',110),
+  ('condition -> ID GE NUMBER','condition',3,'p_condition','app.py',111),
+  ('condition -> ID EQ NUMBER','condition',3,'p_condition','app.py',112),
+  ('condition -> ID NE NUMBER','condition',3,'p_condition','app.py',113),
+  ('increment -> ID PLUSPLUS','increment',2,'p_increment','app.py',117),
+  ('block -> LBRACE statement_list RBRACE','block',3,'p_block','app.py',121),
+  ('println -> PRINTLN LPAREN ID RPAREN SEMICOLON','println',5,'p_println','app.py',125),
 ]
